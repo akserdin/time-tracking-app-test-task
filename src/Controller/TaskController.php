@@ -36,6 +36,7 @@ class TaskController extends AbstractController
      * @Route("/task", name="app_task_list", methods={"GET","HEAD"})
      * @param Request $request
      * @return JsonResponse
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function index(Request $request): JsonResponse
     {
@@ -51,6 +52,7 @@ class TaskController extends AbstractController
      * @param Request $request
      * @param TaskStoreService $taskStoreService
      * @return JsonResponse
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function store(Request $request, TaskStoreService $taskStoreService): JsonResponse
     {
@@ -69,6 +71,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/download-pdf", name="app_tasks_pdf", methods={"GET"})
      * @return mixed
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function downloadPdf(Request $request)
     {
