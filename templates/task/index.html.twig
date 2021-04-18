@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Task list{% endblock %}
+
+{% block body %}
+    <div id="task-app">
+        <template v-if="! formMode">
+            <div class="d-flex justify-content-between mb-4">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="input-min-date" class="mr-1">From</label>
+                        <input id="input-min-date" type="date" v-model="filters.minDate" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="form-group mx-2">
+                        <label for="input-max-date" class="mr-1">To</label>
+                        <input id="input-max-date" type="date" v-model="filters.maxDate" class="form-control form-control-sm">
+                    </div>
+
+                    <a :href="downloadPdfLink" class="btn btn-warning btn-sm mx-1">Download PDF</a>
+
+                    <button v-if="hasFilters" @click="clearFilters" class="btn btn-outline-danger btn-sm">Reset filters</button>
+                </form>
+
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary btn-sm" @click="createTask">Add</button>
+                </div>
+            </div>
+
+            <p v-if="! tasks.length">No tasks in database</p>
+
+            <div v-if="tasks.length">
+                <table class="table table-striped">
+                    <caption>Total: <span v-text="total"></span>. Page: <span v-text="currentPage"></span></caption>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Comment</th>
+                        <th>Time spent</th>
+                        <th>Created at</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr v-for="t in tasks">
+                        <td v-text="t.id"></td>
+                        <td v-text="t.title"></td>
+                        <td v-text="t.comment"></td>
+                        <td v-text="t.timeSpent"></td>
+                        <td v-text="t.createdAt"></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-center">
+                    <button @click="prevPage" :disabled="currentPage === 1" class="btn btn-secondary btn-sm mx-1">Previous</button>
+                    <button @click="nextPage" :disabled="! hasMorePages" class="btn btn-secondary btn-sm mx-1">Next</button>
+                </div>
+            </div>
+        </template>
+
+        <div v-if="formMode">
+            <div class="form-group">
+                <label for="input-title">Title</label>
+                <input type="text"
+                       id="input-title"
+                       class="form-control"
+                       v-model="formData.title"
+                       :class="{'is-invalid': errors.hasOwnProperty('title')}"
+                       :disabled="loading">
+                <small v-if="errors.hasOwnProperty('title')" class="text-danger" v-text="errors.title"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="input-comment">Comment</label>
+                <textarea id="input-comment"
+                          class="form-control"
+                          v-model="formData.comment"
+                          :class="{'is-invalid': errors.hasOwnProperty('comment')}"
+                          :disabled="loading">></textarea>
+
+                <small v-if="errors.hasOwnProperty('comment')" class="text-danger" v-text="errors.comment"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="input-time-spent">Time spent</label>
+                <input type="number"
+                       id="input-time-spent"
+                       class="form-control"
+                       v-model="formData.timeSpent"
+                       :class="{'is-invalid': errors.hasOwnProperty('timeSpent')}"
+                       :disabled="loading">
+                <small v-if="errors.hasOwnProperty('timeSpent')" class="text-danger" v-text="errors.timeSpent"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="input-created-at">Date</label>
+                <input type="date"
+                       v-model="formData.createdAt"
+                       :disabled="loading"
+                       :class="{'is-invalid': errors.hasOwnProperty('createdAt')}"
+                       class="form-control">
+
+                <small v-if="errors.hasOwnProperty('createdAt')" class="text-danger" v-text="errors.createdAt"></small>
+            </div>
+
+            <button @click="cancelForm" :disabled="loading" class="btn btn-warning">Cancel</button>
+            <button @click="saveTask" :disabled="loading" class="btn btn-success">Save</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="{{ asset('js/task-app.js') }}"></script>
+{% endblock %}

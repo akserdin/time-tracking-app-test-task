@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px dashed #cccccc;
+        }
+
+        tr, th, td {
+            padding: 6px;
+            border: 1px dashed #cccccc;
+        }
+
+        th, td {
+            text-align: left;
+        }
+    </style>
+    <title>All user tasks</title>
+</head>
+<body>
+
+<h1>All tasks</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Comment</th>
+        <th>Time spent</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for task in tasks %}
+    <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.comment }}</td>
+        <td>{{ task.timeSpent }}</td>
+        <td>{{ task.createdAt|date('Y-m-d') }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p>Total time spent: {{ total }} minutes</p>
+
+</body>
+</html>

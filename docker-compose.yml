@@ -1,0 +1,55 @@
+version: "3.8"
+services:
+  app:
+    build:
+      args:
+        user: ${OSX_USER}
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: webapp
+    container_name: ${APP_NAME}-webapp
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www:cached
+      - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini:cached
+    networks:
+      - symfony-app-network
+  db:
+    image: mysql:5.7.32
+    container_name: ${APP_NAME}-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d:cached
+      - ./docker-compose/mysql/my.cnf:/etc/mysql/my.cnf:cached
+      - dbdata:/var/lib/mysql
+    networks:
+      - symfony-app-network
+  webserver:
+    image: nginx:alpine
+    container_name: ${APP_NAME}-webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www:cached
+      - ./docker-compose/nginx:/etc/nginx/conf.d:cached
+    networks:
+      - symfony-app-network
+networks:
+  symfony-app-network:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
